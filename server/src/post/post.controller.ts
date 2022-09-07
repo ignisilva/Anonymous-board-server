@@ -1,6 +1,25 @@
-import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreatePostDto, CreatePostResponseDto } from './dto';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
+import {
+  CheckPostPasswordDto,
+  CheckPostPasswordResponseDto,
+  CreatePostDto,
+  CreatePostResponseDto,
+} from './dto';
 import { PostService } from './post.service';
 
 @ApiTags('Posts API')
@@ -25,6 +44,32 @@ export class PostController {
     return {
       statusCode: HttpStatus.CREATED,
       data: { id: post.id },
+    };
+  }
+
+  @HttpCode(200)
+  @Post(':id/check-password')
+  @ApiOperation({
+    summary: '게시글 비밀번호 일치 확인 API',
+    description: '게시글의 비밀번호 일치 여부를 확인합니다.',
+  })
+  @ApiOkResponse({
+    description: '게시글 비밀번호 일치 여부 결과입니다.',
+    type: CheckPostPasswordResponseDto,
+  })
+  @ApiParam({ name: 'id', description: '게시글 id' })
+  async checkPostPassword(
+    @Body() checkPostPasswordDto: CheckPostPasswordDto,
+    @Param('id') id: string,
+  ): Promise<CheckPostPasswordResponseDto> {
+    const isCorrect = await this.postService.checkPostPassword(
+      checkPostPasswordDto,
+      Number(id),
+    );
+
+    return {
+      statusCode: HttpStatus.OK,
+      data: { isCorrect },
     };
   }
 }

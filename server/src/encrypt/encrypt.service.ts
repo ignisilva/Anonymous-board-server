@@ -28,7 +28,7 @@ export class EncryptService {
     }
   }
 
-  async compare(plainText: string, hashedText: string): Promise<Boolean> {
+  async compare(plainText: string, hashedText: string): Promise<boolean> {
     try {
       const isCorrect = await bcrypt.compare(plainText, hashedText);
 
