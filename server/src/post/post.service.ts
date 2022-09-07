@@ -103,4 +103,21 @@ export class PostService {
 
     await this.postRepository.save(post);
   }
+
+  async remove(id: number): Promise<void> {
+    const post = await this.postRepository.findOne({
+      where: {
+        id,
+        isDeleted: false,
+      },
+    });
+
+    if (!post) {
+      throw new NotFoundException('해당 게시글을 찾을 수 없습니다.');
+    }
+
+    post.isDeleted = true;
+
+    await this.postRepository.save(post);
+  }
 }

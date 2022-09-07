@@ -1,7 +1,7 @@
 import {
   Body,
   Controller,
-  Get,
+  Delete,
   HttpCode,
   HttpStatus,
   Param,
@@ -20,8 +20,10 @@ import {
   CheckPostPasswordResponseDto,
   CreatePostDto,
   CreatePostResponseDto,
+  RemovePostResponseDto,
+  UpdatePostDto,
+  UpdatePostResponseDto,
 } from './dto';
-import { UpdatePostDto, UpdatePostResponseDto } from './dto/update-post.dto';
 import { PostService } from './post.service';
 
 @ApiTags('Posts API')
@@ -82,7 +84,7 @@ export class PostController {
   })
   @ApiOkResponse({
     description: '게시글 수정 결과입니다.',
-    type: CheckPostPasswordResponseDto,
+    type: UpdatePostResponseDto,
   })
   @ApiParam({ name: 'id', description: '게시글 id' })
   async update(
@@ -94,6 +96,25 @@ export class PostController {
     return {
       statusCode: HttpStatus.OK,
       message: '게시글 수정 완료',
+    };
+  }
+
+  @Delete(':id')
+  @ApiOperation({
+    summary: '게시글 삭제 API',
+    description: '게시글을 삭제합니다.',
+  })
+  @ApiOkResponse({
+    description: '게시글 삭제 결과입니다.',
+    type: RemovePostResponseDto,
+  })
+  @ApiParam({ name: 'id', description: '게시글 id' })
+  async remove(@Param('id') id: string): Promise<RemovePostResponseDto> {
+    await this.postService.remove(Number(id));
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: '게시글 삭제 완료',
     };
   }
 }
