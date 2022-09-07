@@ -104,6 +104,10 @@ export class PostService {
     await this.postRepository.save(post);
   }
 
+  /**
+   * 게시글을 수정한다.
+   * @param { id } 게시글 id
+   */
   async remove(id: number): Promise<void> {
     const post = await this.postRepository.findOne({
       where: {
