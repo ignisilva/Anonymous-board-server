@@ -71,6 +71,34 @@ export class PostService {
   }
 
   /**
+   * 게시글 목록을 조회한다.
+   * 오래된 글 기준 내림차순이며, 추가 로드는 20개 단위이다.
+   * @param { lastId } 사용자가 받은 게시글 목록 중 마지막 게시글(가장 오래된 게시글)의 id 이다.
+   * @returns { Post[] } Post의 배열을 반환한다. 단, 반환하는 필드는 id, title, content, createdAt 이다.
+   */
+  async find(lastId: number): Promise<Post[]> {
+    const DEFAULT_PAGE = 20;
+
+    const query = this.postRepository
+      .createQueryBuilder('p')
+      .select('p.id')
+      .addSelect('p.title')
+      .addSelect('p.content')
+      .addSelect('p.createdAt')
+      .where('p.isDeleted = :isDeleted', { isDeleted: false });
+
+    if (lastId) {
+      query.andWhere('p.id < :id', { id: lastId });
+    }
+
+    query.orderBy('p.id', 'DESC').limit(DEFAULT_PAGE);
+
+    const posts = await query.getMany();
+
+    return posts;
+  }
+
+  /**
    * 게시글을 수정한다.
    * @param { updatePostDto } 게시글 수정 Dto
    * @param { id } 게시글 id

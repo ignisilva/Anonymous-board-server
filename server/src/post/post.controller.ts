@@ -2,17 +2,20 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import {
@@ -20,6 +23,7 @@ import {
   CheckPostPasswordResponseDto,
   CreatePostDto,
   CreatePostResponseDto,
+  FindPostsResponseDto,
   RemovePostResponseDto,
   UpdatePostDto,
   UpdatePostResponseDto,
@@ -74,6 +78,29 @@ export class PostController {
     return {
       statusCode: HttpStatus.OK,
       data: { isCorrect },
+    };
+  }
+
+  @Get()
+  @ApiOperation({
+    summary: '게시글 목록 조회 API',
+    description: '게시글을 목록을 조회합니다.',
+  })
+  @ApiOkResponse({
+    description: '게시글 목록 조회 결과입니다.',
+    type: FindPostsResponseDto,
+  })
+  @ApiQuery({
+    name: 'last_id',
+    required: false,
+    description: '마지막 게시글 id',
+  })
+  async find(@Query('last_id') lastId: string): Promise<FindPostsResponseDto> {
+    const posts = await this.postService.find(Number(lastId));
+
+    return {
+      statusCode: HttpStatus.OK,
+      data: posts,
     };
   }
 
