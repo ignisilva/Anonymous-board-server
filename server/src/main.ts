@@ -8,7 +8,12 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const configService: ConfigService = app.get(ConfigService);
+
+  const PREFIX = configService.get('APP_PREFIX');
+
   const PORT = configService.get('PORT') | 3000;
+
+  app.setGlobalPrefix(PREFIX);
 
   app.enableCors();
 
@@ -20,11 +25,11 @@ async function bootstrap() {
     }),
   );
 
-  setupSwagger(app);
+  setupSwagger(app, PREFIX);
 
   await app.listen(PORT, () => {
-    Logger.log(`server run on http://localhost:${PORT}`);
-    Logger.log(`api docs run on http://localhost:${PORT}/docs`);
+    Logger.log(`server run on http://localhost:${PORT}${PREFIX}`);
+    Logger.log(`api docs run on http://localhost:${PORT}${PREFIX}/docs`);
   });
 }
 bootstrap();

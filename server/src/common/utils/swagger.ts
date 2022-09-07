@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-export function setupSwagger(app: INestApplication): void {
+export function setupSwagger(app: INestApplication, prefix?: string): void {
   const options = new DocumentBuilder()
     .setTitle('Anonymous Board API Docs')
     .setDescription('Anonymous Board API description')
@@ -10,5 +10,5 @@ export function setupSwagger(app: INestApplication): void {
 
   const document = SwaggerModule.createDocument(app, options);
 
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup(`${prefix}/docs`, app, document);
 }
