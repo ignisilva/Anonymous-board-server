@@ -18,11 +18,23 @@ export class EncryptService {
     const { saltRound } = this.options;
 
     try {
-      const hashedText = await bcrypt.hash(plainText, saltRound);
+      const hashedText = await bcrypt.hash(plainText, Number(saltRound));
 
       return hashedText;
     } catch (error) {
       Logger.error(`error occur on EncrpytService.hash`, error.stack);
+
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async compare(plainText: string, hashedText: string): Promise<Boolean> {
+    try {
+      const isCorrect = await bcrypt.compare(plainText, hashedText);
+
+      return isCorrect;
+    } catch (error) {
+      Logger.error(`error occur on EncrpytService.compare`, error.stack);
 
       throw new InternalServerErrorException();
     }
