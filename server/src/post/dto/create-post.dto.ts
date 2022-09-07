@@ -1,7 +1,6 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsString, Matches, MaxLength } from 'class-validator';
 import { ResponseDto } from 'src/common/dto';
-import { Post } from '../entities';
 
 export class CreatePostDto {
   @IsString({ message: 'title은 문자열이어야 합니다.' })
