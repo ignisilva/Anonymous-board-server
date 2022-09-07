@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EncryptService } from 'src/encrypt/encrypt.service';
 import { Repository } from 'typeorm';
 import { CheckPostPasswordDto, CreatePostDto } from './dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities';
 
 /**
@@ -41,7 +42,13 @@ export class PostService {
     return post;
   }
 
-  async checkPostPassword(
+  /**
+   * 게시글의 비밀번호와 요청온 비밀번호의 일치 여부를 확인한다.
+   * @param { checkPostPasswordDto } 게시글 비밀번호 일치 여부 확인 Dto
+   * @param { id } 게시글 id
+   * @returns { boolean } 일치 여부(T/F)
+   */
+  async checkPassword(
     checkPostPasswordDto: CheckPostPasswordDto,
     id: number,
   ): Promise<boolean> {
@@ -61,5 +68,39 @@ export class PostService {
     );
 
     return isCorrect;
+  }
+
+  /**
+   * 게시글을 수정한다.
+   * @param { updatePostDto } 게시글 수정 Dto
+   * @param { id } 게시글 id
+   */
+  async update(updatePostDto: UpdatePostDto, id: number): Promise<void> {
+    const { title, content, password } = updatePostDto;
+
+    const post = await this.postRepository.findOne({
+      where: {
+        id,
+        isDeleted: false,
+      },
+    });
+
+    if (!post) {
+      throw new NotFoundException('해당 게시글을 찾을 수 없습니다.');
+    }
+
+    if (title) {
+      post.title = title;
+    }
+
+    if (content) {
+      post.content = content;
+    }
+
+    if (password) {
+      post.password = await this.encryptService.hash(password);
+    }
+
+    await this.postRepository.save(post);
   }
 }

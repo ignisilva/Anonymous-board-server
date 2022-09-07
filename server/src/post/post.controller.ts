@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
 } from '@nestjs/common';
 import {
@@ -20,6 +21,7 @@ import {
   CreatePostDto,
   CreatePostResponseDto,
 } from './dto';
+import { UpdatePostDto, UpdatePostResponseDto } from './dto/update-post.dto';
 import { PostService } from './post.service';
 
 @ApiTags('Posts API')
@@ -58,11 +60,11 @@ export class PostController {
     type: CheckPostPasswordResponseDto,
   })
   @ApiParam({ name: 'id', description: '게시글 id' })
-  async checkPostPassword(
+  async checkPassword(
     @Body() checkPostPasswordDto: CheckPostPasswordDto,
     @Param('id') id: string,
   ): Promise<CheckPostPasswordResponseDto> {
-    const isCorrect = await this.postService.checkPostPassword(
+    const isCorrect = await this.postService.checkPassword(
       checkPostPasswordDto,
       Number(id),
     );
@@ -70,6 +72,28 @@ export class PostController {
     return {
       statusCode: HttpStatus.OK,
       data: { isCorrect },
+    };
+  }
+
+  @Patch(':id')
+  @ApiOperation({
+    summary: '게시글 수정 API',
+    description: '게시글을 수정합니다.',
+  })
+  @ApiOkResponse({
+    description: '게시글 수정 결과입니다.',
+    type: CheckPostPasswordResponseDto,
+  })
+  @ApiParam({ name: 'id', description: '게시글 id' })
+  async update(
+    @Body() updatePostDto: UpdatePostDto,
+    @Param('id') id: string,
+  ): Promise<UpdatePostResponseDto> {
+    await this.postService.update(updatePostDto, Number(id));
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: '게시글 수정 완료',
     };
   }
 }
